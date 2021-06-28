@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    </script>
+    <title>Document</title>
+  </head>
+  <body>
+    <script>
+        let forStorage = [];
+      // Fetching JSON
+      fetch("./data.json")
+        .then((response) => {
+          return response.json();
+        })
+        .then((data) => {
+          let question_index = 1;
+          let answer_id = 1;
+          //Loop keys and values through JSON
+          for (let [key, value] of Object.entries(data.quiz)) {
+            document.body.innerHTML += `<h1>Question ${question_index++}: ${
+              value.question
+            }</h1>`;
+            value.options.forEach((element) => {
+              document.body.innerHTML += `<input type='radio' style='background:green;' class='answers' id='answer_id${answer_id++}' name='${key}' value='${element}'><label for='${element}'>${element}</label><br>`;
+            });
+          }
+
+
+          // Referencing all answers
+          let answers = document.querySelectorAll('.answers');
+          let answers_text = document.querySelectorAll('.answers_text')
+
+          // Looping through all correct answers and placing then in an array
+          let correct_answers = [];
+          for (let value of Object.values(data.quiz)){
+              correct_answers.push(value.answer)
+            }
+
+
+          // Creating icons
+          let icon_correct = document.createElement('i');
+          icon_correct.classList = "fas fa-check";
+          icon_correct.style.cssText = "margin-left:3px; color:green"
+          let icon_incorrect = document.createElement('i');
+          icon_incorrect.classList = "fas fa-times";
+          icon_incorrect.style.cssText = "margin-left:3px; color:red"
+          
+          //Adding onclick function to all answers
+        answers.forEach(element=>{
+          element.onclick = (e)=>{
+            console.log(localStorage);
+            //On each click, get reference to newly created incorrect icons
+            let icons = document.querySelectorAll('.fa-times');
+            //On each click, get reference to newly created correct icons
+            let icons_correct = document.querySelectorAll('.fa-check');
+            // Removing incorrect icons only
+            icons.forEach(element =>{
+              element.remove()
+            })
+            
+            // Check if the selected answer is correct 
+            //(By check if the picked answers is within the array of answers )
+            if(correct_answers.includes(e.target.value)){
+              
+              //Referencing label for checked correct answer
+              let selected_answer = document.querySelector(`label[for='${e.target.value}'`);
+
+              //Prevent adding more then one correct icon by checking label's children
+              if(!(selected_answer.childNodes.length > 1)){
+                document.querySelector(`label[for='${e.target.value}'`).innerHTML += '<i class="fas fa-check" style="margin-left:3px; color:green"></i>';
+              }
+            } else{
+              document.querySelector(`label[for='${e.target.value}'`).innerHTML += '<i class="fas fa-times" style="margin-left:3px; color:red"></i>';
+            }
+            // local storage on click
+            
+              answers.forEach(e =>{
+                
+                if(e.checked){
+                  forStorage.push(new item(e.getAttribute('id'),e.value))
+                  
+                  for(let i = 0;i<forStorage.length;i++){
+                    console.log("Item added");
+                  localStorage.setItem(forStorage[i].key,forStorage[i].value)
+                  }
+
+                  
+                  // console.log(e);
+                  // console.log(e.getAttribute('id'));
+                  // console.log(e.value);
+                }
+                // if(e.checked == false){
+                //     console.log("Item removed");
+                //     for(let i = 0;i<forStorage.length;i++){
+                //   localStorage.removeItem(forStorage[i].key)
+                //   }
+                //   }
+            });
+          }
+          
+        });
+        setTimeout(window.onload = function(){
+              for(let key in localStorage){
+                forStorage.push(key)
+                if(forStorage.includes(key)){
+                  answers.forEach(e=>{
+                    if(e.getAttribute('id') == key){
+                      e.checked = true;
+                    }
+                  })
+                }
+              }
+              
+            },1000)
+        });
+
+        class item{
+          constructor(key,value){
+            this.key = key;
+            this.value = value;
+          }
+        }
+
+    </script>
+  </body>
+</html>
