@@ -10,6 +10,7 @@
   </head>
   <body>
     <script>
+      // Making array that will be used for localStorage a global variable
         let forStorage = [];
       // Fetching JSON
       fetch("./data.json")
@@ -19,7 +20,7 @@
         .then((data) => {
           let question_index = 1;
           let answer_id = 1;
-          //Loop keys and values through JSON
+          // Loop keys and values through JSON
           for (let [key, value] of Object.entries(data.quiz)) {
             document.body.innerHTML += `<h1>Question ${question_index++}: ${
               value.question
@@ -49,13 +50,13 @@
           icon_incorrect.classList = "fas fa-times";
           icon_incorrect.style.cssText = "margin-left:3px; color:red"
           
-          //Adding onclick function to all answers
+          // Adding onclick function to all answers
         answers.forEach(element=>{
           element.onclick = (e)=>{
             console.log(localStorage);
-            //On each click, get reference to newly created incorrect icons
+            // On each click, get reference to newly created incorrect icons
             let icons = document.querySelectorAll('.fa-times');
-            //On each click, get reference to newly created correct icons
+            // On each click, get reference to newly created correct icons
             let icons_correct = document.querySelectorAll('.fa-check');
             // Removing incorrect icons only
             icons.forEach(element =>{
@@ -66,10 +67,10 @@
             //(By check if the picked answers is within the array of answers )
             if(correct_answers.includes(e.target.value)){
               
-              //Referencing label for checked correct answer
+              // Referencing label for checked correct answer
               let selected_answer = document.querySelector(`label[for='${e.target.value}'`);
 
-              //Prevent adding more then one correct icon by checking label's children
+              // Prevent adding more then one correct icon by checking label's children
               if(!(selected_answer.childNodes.length > 1)){
                 document.querySelector(`label[for='${e.target.value}'`).innerHTML += '<i class="fas fa-check" style="margin-left:3px; color:green"></i>';
               }
@@ -79,30 +80,31 @@
             // local storage on click
             
               answers.forEach(e =>{
-                
+                // Check if the radio button is checked
                 if(e.checked){
+                  // If true, add an object of input to array
                   forStorage.push(new item(e.getAttribute('id'),e.value))
-                  
+                  // Loop through an array of checked input objects
                   for(let i = 0;i<forStorage.length;i++){
-                    console.log("Item added");
+                  // Add each input object to localStorage by key and it's value
                   localStorage.setItem(forStorage[i].key,forStorage[i].value)
                   }
-
-                  
-                  // console.log(e);
-                  // console.log(e.getAttribute('id'));
-                  // console.log(e.value);
+                  // Loop through input answers
+                  for (let i = 1; i<answers.length;i++){
+                    // Get each answer id
+                    let checkElement = document.querySelector(`#answer_id${i}`)
+                    // Check if the input is checked
+                    if(checkElement.checked == false){
+                      // If input isn't checked, remove it from localStorage
+                      localStorage.removeItem(checkElement.getAttribute('id'))
+                    }
+                  }
                 }
-                // if(e.checked == false){
-                //     console.log("Item removed");
-                //     for(let i = 0;i<forStorage.length;i++){
-                //   localStorage.removeItem(forStorage[i].key)
-                //   }
-                //   }
             });
           }
           
         });
+        // Load checked answers from localStorage
         setTimeout(window.onload = function(){
               for(let key in localStorage){
                 forStorage.push(key)
